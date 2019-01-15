@@ -6,8 +6,16 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="java-ee-rest-api-szkolna_17" />
+        <module name="rest-api" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="rest-api" target="1.7" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="rest-api" options="-Xlint:all" />
+    </option>
   </component>
 </project>
