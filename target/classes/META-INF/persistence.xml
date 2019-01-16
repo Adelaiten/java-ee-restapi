@@ -19,15 +19,12 @@
             <property name="hibernate.format_sql" value="true"/>
             <property name="hibernate.use_sql_comments" value="true"/>
             <property name="javax.persistence.schema-generation.database.action" value="create"/>
-            <!--<property name="javax.persistence.schema-generation.scripts.action" value="create"/>-->
-            <!--<property name="javax.persistence.schema-generation.scripts.create-target" value="src/main/resources/META-INF/create-schema.ddl"/>-->
-            <!--<property name="javax.persistence.schema-generation.scripts.drop-target" value="src/main/resources/META-INF/drop-schema.ddl"/>-->
 
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
             <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/szkolna_17"/>
             <property name="javax.persistence.jdbc.user" value="karol"/>
             <property name="javax.persistence.jdbc.password" value="4313284"/>
-            <!--<property name="javax.persistence.sql-load-script-source" value="insert.sql"/>-->
+
         </properties>
     </persistence-unit>
 

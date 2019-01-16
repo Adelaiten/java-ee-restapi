@@ -24,24 +24,33 @@ public class Main {
         }
 
         User user = new User();
-        user.setId(1);
         user.setName("karol");
         user.setNick("notarian");
         user.setSurname("trzaska");
         user.setEmail("karoltrzaska19@gmail.com");
 
         Comment comment = new Comment();
-        comment.setId(1);
+
         comment.setContent("hahaha");
         comment.setUser(user);
         comment.setDate(birthDate1);
         Note note = new Note();
         note.setContent("hehehe");
         note.setDate(birthDate1);
-        note.setNoteId(1);
+
+
         note.setTitle("Title");
         note.setUser(user);
         comment.setNote(note);
+        EntityTransaction transaction = em.getTransaction();
+        transaction.begin();
+        em.persist(note);
+        em.persist(comment);
+
+        em.persist(user);
+
+
+        transaction.commit();
     }
 
     public static void main(String[] args) {
