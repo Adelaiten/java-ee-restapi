@@ -6,9 +6,9 @@
 
     <persistence-unit name="szkolna_17" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        <class>com.codecool.krk.models.User</class>
-        <class>com.codecool.krk.models.Note</class>
-        <class>com.codecool.krk.models.Comment</class>
+        <class>com.codecool.krk.servlets.models.User</class>
+        <class>com.codecool.krk.servlets.models.Note</class>
+        <class>com.codecool.krk.servlets.models.Comment</class>
 
 
 
