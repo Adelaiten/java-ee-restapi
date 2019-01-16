@@ -1,7 +1,8 @@
-package com.codecool.krk.models;
+package models;
 
 import javax.persistence.*;
 import java.util.Date;
+
 
 
 @Entity(name = "Notes")

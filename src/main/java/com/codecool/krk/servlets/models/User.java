@@ -1,4 +1,4 @@
-package com.codecool.krk.models;
+package models;
 
 import javax.persistence.*;
 import java.util.List;
