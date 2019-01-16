@@ -7,7 +7,7 @@
     <groupId>com.codecool.krk</groupId>
     <artifactId>rest-api</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <name>JPA Example Project</name>
 
     <properties>
@@ -105,6 +105,11 @@
         <sourceDirectory>src/main/java/com/codecool/krk/servlets</sourceDirectory>
 
         <plugins>
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>9.4.7.v20170914</version>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
