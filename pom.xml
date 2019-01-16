@@ -75,6 +75,9 @@
     </dependencies>
 
     <build>
+        <finalName>password-generator</finalName>
+        <sourceDirectory>src/main/java/com/codecool/krk/servlets</sourceDirectory>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
