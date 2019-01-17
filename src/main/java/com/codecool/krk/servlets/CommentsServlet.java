@@ -3,10 +3,12 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import connections.SingletonEntityManagerFactory;
 import models.Comment;
+import org.hibernate.Session;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -14,29 +16,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.List;
 
-@WebServlet(urlPatterns = {"/comments/*"})
+@WebServlet(urlPatterns = {"/comments"})
 public class CommentsServlet extends HttpServlet {
     EntityManagerFactory entityManagerFactory = SingletonEntityManagerFactory.getInstance();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String path = request.getRequestURI().replace("/comments", "");
-        System.out.println("path ="+path);
-        if(path.equalsIgnoreCase("")){
-
-        } else {
-            path = path.replace("/", "");
-            int id = Integer.parseInt(path);
-            sendCommentWithId(response, id);
-        }
-    }
-
-    private void sendCommentWithId(HttpServletResponse response, int id) throws IOException {
         EntityManager em = entityManagerFactory.createEntityManager();
-        Comment comment = em.find(Comment.class, id);
+//        List<Comment> comments = em.createNamedQuery("allCommentsQuery", Comment.class).getResultList();
+        String hql = "FROM Comments";
+        em.getTransaction().begin();
+        Query query = em.createQuery(hql, Comment.class);
+        List<Comment> comments =(List<Comment>) query.getResultList();
+        Type commentsType = new TypeToken<List<Comment>>(){}.getType();
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-        comment.setIds();
-        String json = gson.toJson(comment);
+        String json = gson.toJson(comments, commentsType);
         response.getWriter().write(json);
+        em.close();
     }
 }
