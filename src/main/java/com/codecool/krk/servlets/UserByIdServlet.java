@@ -13,16 +13,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.List;
 
 
 @WebServlet(urlPatterns = {"/user/*"})
-public class ServletUser extends HttpServlet {
+public class UserByIdServlet extends HttpServlet {
     private EntityManagerFactory emf = SingletonEntityManagerFactory.getInstance();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String url = request.getRequestURI();
+        System.out.println(url);
         int userId = Integer.parseInt(url.replace("/user/", ""));
+        System.out.println(userId);
         getUserById(userId, request, response);
 
     }
