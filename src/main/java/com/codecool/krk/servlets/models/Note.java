@@ -3,9 +3,9 @@ package models;
 import javax.persistence.*;
 import java.util.Date;
 
-
-
-@Entity(name = "Notes")
+@Entity
+@Table(name = "Notes")
+@NamedNativeQuery(name="allNotesQuery", query="select * from notes", resultClass=Note.class)
 public class Note {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,6 +19,8 @@ public class Note {
 
     @Temporal(TemporalType.DATE)
     private Date date;
+
+
 
     public int getNoteId() {
         return noteId;
