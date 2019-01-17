@@ -1,3 +1,5 @@
+import connections.SingletonEntityManagerFactory;
+
 import javax.persistence.EntityManagerFactory;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
