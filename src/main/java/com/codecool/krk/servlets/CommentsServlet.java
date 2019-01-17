@@ -10,17 +10,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet(urlPatterns = {"/comments/"})
+@WebServlet(urlPatterns = {"/comments/*"})
 public class CommentsServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         System.out.println("dupa");
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("szkolna_17");
-        String string = new String();
 
         EntityManager em = emf.createEntityManager();
 
         Comment comment = em.find(Comment.class, 1);
-        response.getWriter().write("<html><body>dupa" + comment.getContent() +"</body></html>");
+        response.getWriter().write("<html><body>dupa " + comment.getContent() +"</body></html>");
+
     }
 }
