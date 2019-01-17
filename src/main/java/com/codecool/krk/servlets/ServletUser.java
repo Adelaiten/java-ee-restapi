@@ -1,3 +1,4 @@
+import javax.persistence.EntityManagerFactory;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -10,6 +11,7 @@ public class ServletUser extends HttpServlet {
 
 
     protected void doGet(HttpServletResponse response, HttpServletRequest request) throws ServletException, IOException {
+        EntityManagerFactory entityManagerFactory = SingletonEntityManagerFactory.getInstance();
 
 
     }
