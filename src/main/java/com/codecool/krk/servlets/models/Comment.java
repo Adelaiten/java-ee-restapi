@@ -3,7 +3,7 @@ import com.google.gson.annotations.Expose;
 
 import javax.persistence.*;
 import java.util.Date;
-
+@NamedNativeQuery(name="allCommentsQuery", query="select * from comments", resultClass=Comment.class)
 @Entity(name = "Comments")
 public class Comment {
     @Id

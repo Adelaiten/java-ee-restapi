@@ -3,9 +3,12 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import connections.*;
 import models.User;
+import org.hibernate.Transaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
+import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -13,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import javax.persistence.EntityTransaction;
 
 
 @WebServlet(urlPatterns = {"/user/*"})
@@ -21,9 +25,7 @@ public class UserByIdServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String url = request.getRequestURI();
-        System.out.println(url);
         int userId = Integer.parseInt(url.replace("/user/", ""));
-        System.out.println(userId);
         getUserById(userId, request, response);
 
     }
@@ -34,6 +36,16 @@ public class UserByIdServlet extends HttpServlet {
 
     }
 
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        EntityManager entityManager = emf.createEntityManager();
+        String url = request.getRequestURI();
+        int userId = Integer.parseInt(url.replace("/user/", ""));
+        User user = entityManager.find(User.class, userId);
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
+        entityManager.remove(user);
+        transaction.commit();
+    }
     private void getUserById(int id, HttpServletRequest request,  HttpServletResponse response) throws ServletException, IOException  {
         EntityManager entityManager = emf.createEntityManager();
         User user = entityManager.find(User.class, id);
