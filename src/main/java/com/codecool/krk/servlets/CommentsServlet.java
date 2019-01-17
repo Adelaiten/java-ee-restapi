@@ -39,14 +39,7 @@ public class CommentsServlet extends HttpServlet {
 
     protected  void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException{
         String requestJSON = servletHelper.parseRequest(request);
-        Gson gson = new Gson();
-        Comment comment = gson.fromJson(requestJSON, Comment.class);
-        Note note = new Note();
-        note.setNoteId(comment.getNote_id());
-        comment.setNote(note);
-        User user = new User();
-        user.setId(comment.getUser_id());
-        comment.setUser(user);
+        Comment comment = getComment(requestJSON);
         EntityManager em = entityManagerFactory.createEntityManager();
         EntityTransaction transaction = em.getTransaction();
         transaction.begin();
@@ -55,5 +48,21 @@ public class CommentsServlet extends HttpServlet {
         em.close();
         response.setHeader("Content-type", "application/json");
         response.getWriter().write("{persist successful}");
+    }
+
+    private Comment getComment(String requestJSON) {
+        Gson gson = new Gson();
+        Comment comment = gson.fromJson(requestJSON, Comment.class);
+        Note note = new Note();
+        note.setNoteId(comment.getNote_id());
+        comment.setNote(note);
+        User user = new User();
+        user.setId(comment.getUser_id());
+        comment.setUser(user);
+        return comment;
+    }
+
+    protected  void doPut(HttpServletRequest request,HttpServletResponse response) throws IOException{
+        doPost(request, response);
     }
 }
