@@ -20,17 +20,23 @@ public class CommentsServlet extends HttpServlet {
     EntityManagerFactory entityManagerFactory = SingletonEntityManagerFactory.getInstance();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("dupa");
-//        EntityManagerFactory emf = Persistence.createEntityManagerFactory("szkolna_17");
+        String path = request.getRequestURI().replace("/comments", "");
+        System.out.println("path ="+path);
+        if(path.equalsIgnoreCase("")){
 
+        } else {
+            path = path.replace("/", "");
+            int id = Integer.parseInt(path);
+            sendCommentWithId(response, id);
+        }
+    }
+
+    private void sendCommentWithId(HttpServletResponse response, int id) throws IOException {
         EntityManager em = entityManagerFactory.createEntityManager();
-
-        Comment comment = em.find(Comment.class, 1);
+        Comment comment = em.find(Comment.class, id);
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-//        Type type = new TypeToken<Comment>() {}.getType();
         comment.setIds();
         String json = gson.toJson(comment);
-        System.out.println(json);
-        response.getWriter().write("<html><body> "+ json  +"</body></html>");
+        response.getWriter().write(json);
     }
 }
