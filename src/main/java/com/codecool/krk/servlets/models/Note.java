@@ -1,5 +1,6 @@
 package models;
 
+import com.google.gson.annotations.Expose;
 import javax.persistence.*;
 import java.util.Date;
 
@@ -9,14 +10,19 @@ import java.util.Date;
 public class Note {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Expose
     private int noteId;
 
-    @ManyToOne
-    private User user;
 
+    @ManyToOne
+    @Expose
+    private User user;
+    @Expose
     private String content;
+    @Expose
     private String title;
 
+    @Expose
     @Temporal(TemporalType.DATE)
     private Date date;
 

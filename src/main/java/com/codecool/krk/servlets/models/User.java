@@ -1,11 +1,9 @@
 package models;
 
 import com.google.gson.annotations.Expose;
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-
 @Entity(name = "Users")
 public class User {
     @Id
