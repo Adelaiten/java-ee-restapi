@@ -16,11 +16,14 @@ import java.io.IOException;
 public class CommentByIdServlet extends HttpServlet {
     private EntityManagerFactory entityManagerFactory = SingletonEntityManagerFactory.getInstance();
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
-        String path = request.getRequestURI().replace("/comments/", "");
-        System.out.println("path ="+path);
-        int id = Integer.parseInt(path);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        int id = getId(request);
         sendCommentById(response, id);
+    }
+
+    private int getId(HttpServletRequest request) {
+        String path = request.getRequestURI().replace("/comments/", "");
+        return Integer.parseInt(path);
     }
 
     private void sendCommentById(HttpServletResponse response, int id) throws IOException {
@@ -30,5 +33,17 @@ public class CommentByIdServlet extends HttpServlet {
         comment.setIds();
         String json = gson.toJson(comment);
         response.getWriter().write(json);
+    }
+
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        int id = getId(request);
+        EntityManager em = entityManagerFactory.createEntityManager();
+        Comment comment = em.find(Comment.class, id);
+        em.remove(comment);
+        response.getWriter().write(String.format("{removed id=%d", id));
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+        
     }
 }
