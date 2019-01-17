@@ -4,10 +4,9 @@ import com.google.gson.reflect.TypeToken;
 import connections.*;
 import models.User;
 import org.hibernate.Transaction;
+import servletHelpers.ServletHelper;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
+import javax.persistence.*;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import javax.persistence.EntityTransaction;
 
 
 @WebServlet(urlPatterns = {"/user/*"})
@@ -30,9 +28,20 @@ public class UserByIdServlet extends HttpServlet {
 
     }
 
-    protected void doPost(HttpServletResponse response,  HttpServletRequest request) throws ServletException, IOException {
-        EntityManager entityManager = emf.createEntityManager();
 
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        EntityManager entityManager = emf.createEntityManager();
+        ServletHelper servletHelper = new ServletHelper();
+        String json = servletHelper.parseRequest(request);
+        Gson gson = new Gson();
+        User user = gson.fromJson(json, User.class);
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
+        entityManager.persist(user);
+        transaction.commit();
+    }
+
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
     }
 
@@ -46,6 +55,8 @@ public class UserByIdServlet extends HttpServlet {
         entityManager.remove(user);
         transaction.commit();
     }
+
+
     private void getUserById(int id, HttpServletRequest request,  HttpServletResponse response) throws ServletException, IOException  {
         EntityManager entityManager = emf.createEntityManager();
         User user = entityManager.find(User.class, id);
