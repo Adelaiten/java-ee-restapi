@@ -56,7 +56,7 @@ public class UserByIdServlet extends HttpServlet {
         transaction.commit();
     }
 
-    
+
     private void getUserById(int id, HttpServletRequest request,  HttpServletResponse response) throws ServletException, IOException  {
         EntityManager entityManager = emf.createEntityManager();
         User user = entityManager.find(User.class, id);
