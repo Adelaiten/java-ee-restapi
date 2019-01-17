@@ -101,7 +101,7 @@
     </dependencies>
 
     <build>
-        <finalName>password-generator</finalName>
+        <finalName>javaEE-szkolna</finalName>
         <sourceDirectory>src/main/java/com/codecool/krk/servlets</sourceDirectory>
 
         <plugins>
