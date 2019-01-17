@@ -26,7 +26,9 @@ public class NotesServlet extends HttpServlet {
             EntityManager em = emf.createEntityManager();
 
             List<Note> nowaLista = em.createNamedQuery("allNotesQuery", Note.class).getResultList();
-
+            for(int i=0; i<nowaLista.size(); i++){
+                System.out.println(nowaLista.get(i).getTitle());
+            }
             response.getWriter().write("<html><body>it's in a console</body></html>");
 
         } else {
