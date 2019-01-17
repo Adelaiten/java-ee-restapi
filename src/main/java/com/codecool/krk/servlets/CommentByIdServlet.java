@@ -58,17 +58,14 @@ public class CommentByIdServlet extends HttpServlet {
         postComment(response, comment, em);
     }
 
-    private void postComment(HttpServletResponse response, Comment comment, EntityManager em) throws IOException {
-        em.clear();
-        EntityTransaction transaction = em.getTransaction();
-        transaction.begin();
-        em.persist(comment);
-        transaction.commit();
-        em.close();
-        response.getWriter().write("{persist successful}");
-    }
-
     private Comment getComment(String requestJSON) {
+        boolean exist = requestJSON.contains("\"id\"");
+        if (exist) {
+            String[] arr = requestJSON.split(",",2);
+            requestJSON = arr[1];
+            requestJSON = "{" + requestJSON;
+            System.out.println(requestJSON);
+        }
         Gson gson = new Gson();
         Comment comment = gson.fromJson(requestJSON, Comment.class);
         Note note = new Note();
@@ -78,6 +75,16 @@ public class CommentByIdServlet extends HttpServlet {
         user.setId(comment.getUser_id());
         comment.setUser(user);
         return comment;
+    }
+
+    private void postComment(HttpServletResponse response, Comment comment, EntityManager em) throws IOException {
+        em.clear();
+        EntityTransaction transaction = em.getTransaction();
+        transaction.begin();
+        em.persist(comment);
+        transaction.commit();
+        em.close();
+        response.getWriter().write("{persist successful}");
     }
 
     protected  void doPut(HttpServletRequest request, HttpServletResponse response) throws  IOException{

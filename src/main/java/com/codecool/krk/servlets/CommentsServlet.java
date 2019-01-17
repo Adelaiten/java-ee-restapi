@@ -24,17 +24,20 @@ public class CommentsServlet extends HttpServlet {
     private ServletHelper servletHelper = new ServletHelper();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        EntityManager em = entityManagerFactory.createEntityManager();
-//        List<Comment> comments = em.createNamedQuery("allCommentsQuery", Comment.class).getResultList();
-        String hql = "FROM Comments";
-        em.getTransaction().begin();
-        Query query = em.createQuery(hql, Comment.class);
-        List<Comment> comments =(List<Comment>) query.getResultList();
+        List<Comment> comments = getComments();
         Type commentsType = new TypeToken<List<Comment>>(){}.getType();
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
         String json = gson.toJson(comments, commentsType);
         response.getWriter().write(json);
+    }
+
+    private List<Comment> getComments() {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        String hql = "FROM Comments";
+        em.getTransaction().begin();
+        Query query = em.createQuery(hql, Comment.class);
         em.close();
+        return (List<Comment>) query.getResultList();
     }
 
     protected  void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException{
