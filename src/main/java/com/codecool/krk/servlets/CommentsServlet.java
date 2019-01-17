@@ -50,10 +50,17 @@ public class CommentsServlet extends HttpServlet {
         transaction.commit();
         em.close();
         response.setHeader("Content-type", "application/json");
-        response.getWriter().write("{persist successful}");
+        response.getWriter().print("{persist successful}");
     }
 
     private Comment getComment(String requestJSON) {
+        boolean exist = requestJSON.contains("\"id\"");
+        if (exist) {
+            String[] arr = requestJSON.split(",",2);
+            requestJSON = arr[1];
+            requestJSON = "{" + requestJSON;
+            System.out.println(requestJSON);
+        }
         Gson gson = new Gson();
         Comment comment = gson.fromJson(requestJSON, Comment.class);
         Note note = new Note();
