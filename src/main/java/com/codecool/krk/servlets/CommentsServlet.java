@@ -20,24 +20,21 @@ import java.util.List;
 
 @WebServlet(urlPatterns = {"/comments"})
 public class CommentsServlet extends HttpServlet {
-    EntityManagerFactory entityManagerFactory = SingletonEntityManagerFactory.getInstance();
+    private EntityManagerFactory entityManagerFactory = SingletonEntityManagerFactory.getInstance();
     private ServletHelper servletHelper = new ServletHelper();
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<Comment> comments = getComments();
-        Type commentsType = new TypeToken<List<Comment>>(){}.getType();
-        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-        String json = gson.toJson(comments, commentsType);
-        response.getWriter().write(json);
-    }
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-    private List<Comment> getComments() {
         EntityManager em = entityManagerFactory.createEntityManager();
         String hql = "FROM Comments";
         em.getTransaction().begin();
         Query query = em.createQuery(hql, Comment.class);
+        List<Comment> comments = (List<Comment>) query.getResultList();
+        Type commentsType = new TypeToken<List<Comment>>(){}.getType();
+        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+        String json = gson.toJson(comments, commentsType);
+        response.getWriter().write(json);
         em.close();
-        return (List<Comment>) query.getResultList();
     }
 
     protected  void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException{
