@@ -31,6 +31,6 @@ public class CommentsServlet extends HttpServlet {
         comment.setIds();
         String json = gson.toJson(comment);
         System.out.println(json);
-        response.getWriter().write("<html><body> "+ json  +"</body></html>");
+        response.getWriter().write("<html><body> "+ json  +"</body></html>"
     }
 }

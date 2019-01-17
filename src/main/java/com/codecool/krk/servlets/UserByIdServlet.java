@@ -42,7 +42,7 @@ public class UserByIdServlet extends HttpServlet {
         user.setNotesIds();
         Type listOfTestObject = new TypeToken<User>(){}.getType();
         String json = gson.toJson(user, listOfTestObject);
-//        response.setHeader("Content-type", "application/json");
-        response.getWriter().write("<html><body> "+ json  +"</body></html>");
+        response.setHeader("Content-type", "application/json");
+        response.getWriter().print(json);
     }
 }
