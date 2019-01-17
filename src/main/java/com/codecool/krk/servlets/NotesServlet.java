@@ -6,7 +6,6 @@ import models.Note;
 import models.User;
 
 import javax.persistence.*;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -20,10 +19,10 @@ import java.util.List;
 public class NotesServlet extends HttpServlet {
 
     EntityManagerFactory emf = SingletonEntityManagerFactory.getInstance();
-    EntityManager em = emf.createEntityManager();
 
     //Retrive data (JSON) from DB and show on page
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        EntityManager em = emf.createEntityManager();
 
         String urlString = parseURL(request);
 
@@ -43,6 +42,7 @@ public class NotesServlet extends HttpServlet {
         response.getWriter().write(json);
 
         em.close();
+
     }
 
     //create json and send object to DB
@@ -52,8 +52,6 @@ public class NotesServlet extends HttpServlet {
         Note newNote = createNoteFromJSON(json);
 
         saveNoteToDB(newNote);
-
-        em.close();
 
         response.setHeader("Content-type", "application/json");
         response.getWriter().write("{'created':'successfully'}");
@@ -74,17 +72,22 @@ public class NotesServlet extends HttpServlet {
 
     //Delete data from DB
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        EntityManager em = emf.createEntityManager();
+
         int noteId = Integer.parseInt(request.getRequestURI());
 
         Note note = em.find(Note.class, noteId);
         em.remove(note);
         response.getWriter().write(String.format("{removed id=%d", noteId));
 
+        em.close();
     }
 
 
     //doGet
     private String createJSONforAllNotes(HttpServletResponse response) throws IOException {
+        EntityManager em = emf.createEntityManager();
+
         List<Note> notesList = (List<Note>) em.createNamedQuery("allNotesQuery", Note.class).getResultList();
 
         Type collectionType = new TypeToken<ArrayList<Note>>(){}.getType();
@@ -93,39 +96,50 @@ public class NotesServlet extends HttpServlet {
 
         String json = gson.toJson(notesList,collectionType);
 
+        em.close();
+
         return json;
 
     }
 
     private String createJSONforSingleNote(HttpServletResponse response, int noteNumber) throws IOException {
+        EntityManager em = emf.createEntityManager();
+
         Note note = em.find(Note.class, noteNumber);
 
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
         String json = gson.toJson(note);
 
+        em.close();
+
         return json;
     }
 
     //doPost
     private void saveNoteToDB(Note newNote){
+        EntityManager em = emf.createEntityManager();
         EntityTransaction transaction = em.getTransaction();
 
         transaction.begin();
         em.persist(newNote);
         transaction.commit();
 
+        em.close();
     }
 
     //doPut
     private void updateNoteInTheDB(Note updatedNote) {
+        EntityManager em = emf.createEntityManager();
         EntityTransaction transaction = em.getTransaction();
 
         transaction.begin();
         em.merge(updatedNote);
         transaction.commit();
+
+        em.close();
     }
-    
+
     //general helpers
     private String parseURL(HttpServletRequest request){
         String urlString = request.getRequestURI();
