@@ -13,19 +13,21 @@ public class Note {
     @Expose
     private int noteId;
 
+    @Expose
+    private int userId;
 
     @ManyToOne
-    @Expose
     private User user;
+
     @Expose
     private String content;
+
     @Expose
     private String title;
 
     @Expose
     @Temporal(TemporalType.DATE)
     private Date date;
-
 
 
     public int getNoteId() {
@@ -44,6 +46,11 @@ public class Note {
         this.user = user;
     }
 
+    public int getUserId() {return userId;}
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 
     public String getContent() {
         return content;

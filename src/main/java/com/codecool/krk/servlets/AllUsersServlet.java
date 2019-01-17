@@ -18,7 +18,6 @@ public class AllUsersServlet extends HttpServlet {
     protected void doPost(HttpServletResponse response,  HttpServletRequest request) throws ServletException, IOException {
         EntityManager entityManager = emf.createEntityManager();
 
-
     }
 
 }

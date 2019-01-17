@@ -3,6 +3,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import connections.SingletonEntityManagerFactory;
 import models.Note;
+import models.User;
 
 import javax.persistence.*;
 import javax.servlet.ServletException;
@@ -21,13 +22,10 @@ public class NotesServlet extends HttpServlet {
     EntityManagerFactory emf = SingletonEntityManagerFactory.getInstance();
     EntityManager em = emf.createEntityManager();
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        EntityManager em = emf.createEntityManager();
+    //Retrive data (JSON) from DB and show on page
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        String urlString = request.getRequestURI();
-
-        urlString = urlString.replace("notes", "");
-        urlString = urlString.replace("/", "");
+        String urlString = parseURL(request);
 
         String json;
 
@@ -36,8 +34,9 @@ public class NotesServlet extends HttpServlet {
             json = createJSONforAllNotes(response);
 
         } else {
+            int noteNumber = Integer.parseInt(urlString);
 
-            json = createJSONforSingleNote(response, urlString);
+            json = createJSONforSingleNote(response, noteNumber);
 
         }
 
@@ -46,6 +45,45 @@ public class NotesServlet extends HttpServlet {
         em.close();
     }
 
+    //create json and send object to DB
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException{
+        String json = request.getReader().readLine();
+
+        Note newNote = createNoteFromJSON(json);
+
+        saveNoteToDB(newNote);
+
+        em.close();
+
+        response.setHeader("Content-type", "application/json");
+        response.getWriter().write("{'created':'successfully'}");
+    }
+
+    //Update data and save to DB
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String json = request.getReader().readLine();
+
+        Note updatedNote = createNoteFromJSON(json);
+
+        updateNoteInTheDB(updatedNote);
+
+        response.setHeader("Content-type", "application/json");
+        response.getWriter().write("{'updated':'successfully'}");
+    }
+
+
+    //Delete data from DB
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        int noteId = Integer.parseInt(request.getRequestURI());
+
+        Note note = em.find(Note.class, noteId);
+        em.remove(note);
+        response.getWriter().write(String.format("{removed id=%d", noteId));
+
+    }
+
+
+    //doGet
     private String createJSONforAllNotes(HttpServletResponse response) throws IOException {
         List<Note> notesList = (List<Note>) em.createNamedQuery("allNotesQuery", Note.class).getResultList();
 
@@ -59,9 +97,7 @@ public class NotesServlet extends HttpServlet {
 
     }
 
-    private String createJSONforSingleNote(HttpServletResponse response, String urlString) throws IOException {
-        int noteNumber = Integer.parseInt(urlString);
-
+    private String createJSONforSingleNote(HttpServletResponse response, int noteNumber) throws IOException {
         Note note = em.find(Note.class, noteNumber);
 
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
@@ -71,4 +107,48 @@ public class NotesServlet extends HttpServlet {
         return json;
     }
 
+    //doPost
+    private void saveNoteToDB(Note newNote){
+        EntityTransaction transaction = em.getTransaction();
+
+        transaction.begin();
+        em.persist(newNote);
+        transaction.commit();
+
+    }
+
+    //doPut
+    private void updateNoteInTheDB(Note updatedNote) {
+        EntityTransaction transaction = em.getTransaction();
+
+        transaction.begin();
+        em.merge(updatedNote);
+        transaction.commit();
+    }
+    
+    //general helpers
+    private String parseURL(HttpServletRequest request){
+        String urlString = request.getRequestURI();
+
+        urlString = urlString.replace("notes", "");
+        urlString = urlString.replace("/", "");
+
+        return urlString;
+    }
+
+    private Note createNoteFromJSON(String json){
+        Gson gson = new Gson();
+
+        Note newNote = gson.fromJson(json, Note.class);
+
+        int userId = newNote.getUserId();
+
+        User user = new User();
+
+        user.setId(userId);
+
+        newNote.setUser(user);
+
+        return newNote;
+    }
 }
