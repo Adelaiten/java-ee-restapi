@@ -3,6 +3,7 @@ import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import connections.SingletonEntityManagerFactory;
 import models.Note;
 import models.User;
 
@@ -20,46 +21,46 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-@WebServlet(name="Notes_Servlet", urlPatterns = {"/notes/"})
+@WebServlet(name="Notes_Servlet", urlPatterns = {"/notes/*"})
 public class NotesServlet extends HttpServlet {
 
+    EntityManagerFactory emf = SingletonEntityManagerFactory.getInstance();
+    EntityManager em = emf.createEntityManager();
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
         String urlString = request.getRequestURI();
 
         urlString = urlString.replace("notes", "");
         urlString = urlString.replace("/", "");
 
+        System.out.println("Url string:" + urlString);
 
         if(urlString.isEmpty()) {
-            EntityManagerFactory emf = Persistence.createEntityManagerFactory("szkolna_17");
-            EntityManager em = emf.createEntityManager();
 
-            ArrayList<Note> notesList = (ArrayList<Note>) em.createNamedQuery("allNotesQuery", Note.class).getResultList();
+            List<Note> notesList = (List<Note>) em.createNamedQuery("allNotesQuery", Note.class).getResultList();
+
+            em.close();
 
             Type collectionType = new TypeToken<ArrayList<Note>>(){}.getType();
 
             Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
-            String element = gson.toJson(notesList,collectionType);
+            String json = gson.toJson(notesList,collectionType);
 
-            response.getWriter().write("<html><body>"+element+"</body></html>");
+            response.getWriter().write(json);
 
         } else {
-            EntityManagerFactory emf = Persistence.createEntityManagerFactory("szkolna_17");
-            String string = new String();
 
-            EntityManager em = emf.createEntityManager();
+            int noteNumber = Integer.parseInt(urlString);
+            System.out.println(noteNumber);
+            Note note = em.find(Note.class, noteNumber);
 
-            Note note = em.find(Note.class, 1);
-            response.getWriter().write("<html><body>" +
-                    "Id: " + note.getNoteId() + "<br>" +
-                    "Author: " + note.getUser().getName() + "<br>" +
-                    "Title: " + note.getTitle() + "<br>" +
-                    "Date: " + note.getDate() + "<br>" +
-                    "Content: " + note.getContent() + "<br>" +
-                    "THE URL IS: " + request.getRequestURI() + "<br>" +
-                    "</body></html>");
-        }
+            Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+
+            String json = gson.toJson(note);
+
+            response.getWriter().write(json);        }
     }
 
 }
