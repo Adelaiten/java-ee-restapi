@@ -1,3 +1,4 @@
+import connections.SingletonEntityManagerFactory;
 import models.Comment;
 
 import javax.persistence.EntityManager;
@@ -12,12 +13,13 @@ import java.io.IOException;
 
 @WebServlet(urlPatterns = {"/comments/*"})
 public class CommentsServlet extends HttpServlet {
+    EntityManagerFactory entityManagerFactory = SingletonEntityManagerFactory.getInstance();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         System.out.println("dupa");
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("szkolna_17");
+//        EntityManagerFactory emf = Persistence.createEntityManagerFactory("szkolna_17");
 
-        EntityManager em = emf.createEntityManager();
+        EntityManager em = entityManagerFactory.createEntityManager();
 
         Comment comment = em.find(Comment.class, 1);
         response.getWriter().write("<html><body>dupa " + comment.getContent() +"</body></html>");
