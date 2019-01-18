@@ -24,20 +24,30 @@ import java.lang.reflect.Type;
 public class UserByIdServlet extends HttpServlet {
     private EntityManagerFactory emf = SingletonEntityManagerFactory.getInstance();
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)  {
         String url = request.getRequestURI();
         int userId = Integer.parseInt(url.replace("/user/", ""));
-
         String json = getUserJsonById(userId, request, response);
         response.setHeader("Content-type", "application/json");
-        response.getWriter().print(json);
+        try{
+            response.getWriter().print(json);
+        }catch(IOException ioexc) {
+            System.out.println("Something's wrong with the input!");
+        }
+
     }
 
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response){
         EntityManager entityManager = emf.createEntityManager();
         ServletHelper servletHelper = new ServletHelper();
-        String json = servletHelper.parseRequest(request);
+        String json;
+        try{
+            json = servletHelper.parseRequest(request);
+        }catch(IOException ioexc) {
+            System.out.println("Buffered reader exception!");
+            return;
+        }
         Gson gson = new Gson();
         User user = gson.fromJson(json, User.class);
         EntityTransaction transaction = entityManager.getTransaction();
@@ -46,16 +56,21 @@ public class UserByIdServlet extends HttpServlet {
         transaction.commit();
     }
 
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    protected void doPut(HttpServletRequest request, HttpServletResponse response){
         EntityManager entityManager = emf.createEntityManager();
         ServletHelper servletHelper = new ServletHelper();
-        String json = servletHelper.parseRequest(request);
+        String json;
+        try{
+             json = servletHelper.parseRequest(request);
+        }catch(IOException exc) {
+            System.out.println("Buffered reader exception!");
+            return;
+        }
         User userFromRequest = getUserByJson(json);
         String url = request.getRequestURI();
         int userId = Integer.parseInt(url.replace("/user/", ""));
         User oldUser = entityManager.find(User.class, userId);
         if(oldUser == null) {
-            System.out.println("BUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUULKAAAAAAAAAAAAAAAA");
             postUserWhenNull(response, entityManager, userFromRequest);
         }else {
             userFromRequest.setId(userId);
@@ -67,7 +82,7 @@ public class UserByIdServlet extends HttpServlet {
     }
 
 
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) {
         EntityManager entityManager = emf.createEntityManager();
         String url = request.getRequestURI();
         int userId = Integer.parseInt(url.replace("/user/", ""));
@@ -79,7 +94,7 @@ public class UserByIdServlet extends HttpServlet {
     }
 
 
-    private String getUserJsonById(int id, HttpServletRequest request,  HttpServletResponse response) throws ServletException, IOException  {
+    private String getUserJsonById(int id, HttpServletRequest request,  HttpServletResponse response)  {
         EntityManager entityManager = emf.createEntityManager();
         User user = entityManager.find(User.class, id);
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
@@ -90,15 +105,18 @@ public class UserByIdServlet extends HttpServlet {
 
 
 
-    private void updateUser(HttpServletResponse response, EntityManager entityManager, User user) throws IOException {
-        System.out.println("CHLEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEb");
+    private void updateUser(HttpServletResponse response, EntityManager entityManager, User user)  {
         EntityTransaction transaction = entityManager.getTransaction();
         transaction.begin();
         entityManager.merge(user);
-
         transaction.commit();
         entityManager.close();
-        response.getWriter().print("{edit successful}");
+        try{
+            response.getWriter().print("{edit successful}");
+        }catch(IOException ioexc) {
+            System.out.println("Printing json exception!");
+        }
+
     }
 
 

@@ -20,24 +20,25 @@ import java.util.List;
 
 @WebServlet(urlPatterns = {"/comments"})
 public class CommentsServlet extends HttpServlet {
-    EntityManagerFactory entityManagerFactory = SingletonEntityManagerFactory.getInstance();
+    private EntityManagerFactory entityManagerFactory = SingletonEntityManagerFactory.getInstance();
     private ServletHelper servletHelper = new ServletHelper();
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<Comment> comments = getComments();
-        Type commentsType = new TypeToken<List<Comment>>(){}.getType();
-        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-        String json = gson.toJson(comments, commentsType);
-        response.getWriter().write(json);
-    }
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            EntityManager em = entityManagerFactory.createEntityManager();
+            String hql = "FROM Comments";
+            em.getTransaction().begin();
+            Query query = em.createQuery(hql, Comment.class);
+            List<Comment> comments = (List<Comment>) query.getResultList();
+            Type commentsType = new TypeToken<List<Comment>>() {
+            }.getType();
+            Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+            String json = gson.toJson(comments, commentsType);
+            response.getWriter().write(json);
+            em.close();
+        } catch (IOException e){
 
-    private List<Comment> getComments() {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        String hql = "FROM Comments";
-        em.getTransaction().begin();
-        Query query = em.createQuery(hql, Comment.class);
-        em.close();
-        return (List<Comment>) query.getResultList();
+        }
     }
 
     protected  void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException{
@@ -50,10 +51,17 @@ public class CommentsServlet extends HttpServlet {
         transaction.commit();
         em.close();
         response.setHeader("Content-type", "application/json");
-        response.getWriter().write("{persist successful}");
+        response.getWriter().print("{persist successful}");
     }
 
     private Comment getComment(String requestJSON) {
+        boolean exist = requestJSON.contains("\"id\"");
+        if (exist) {
+            String[] arr = requestJSON.split(",",2);
+            requestJSON = arr[1];
+            requestJSON = "{" + requestJSON;
+            System.out.println(requestJSON);
+        }
         Gson gson = new Gson();
         Comment comment = gson.fromJson(requestJSON, Comment.class);
         Note note = new Note();

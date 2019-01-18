@@ -1,6 +1,5 @@
 package models;
 import com.google.gson.annotations.Expose;
-
 import javax.persistence.*;
 import java.util.Date;
 @NamedNativeQuery(name="allCommentsQuery", query="select * from comments", resultClass=Comment.class)
@@ -10,6 +9,7 @@ public class Comment {
     @GeneratedValue
     @Expose
     private int id;
+
 
     @ManyToOne
     private Note note;

@@ -34,10 +34,15 @@ public class CommentByIdServlet extends HttpServlet {
     private void sendCommentById(HttpServletResponse response, int id) throws IOException {
         EntityManager em = entityManagerFactory.createEntityManager();
         Comment comment = em.find(Comment.class, id);
+        if(comment != null){
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
         comment.setIds();
         String json = gson.toJson(comment);
         response.getWriter().write(json);
+        } else {
+            response.setHeader("Content-type", "application/json");
+            response.getWriter().print("{no comment with chosen id}");
+        }
     }
 
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {

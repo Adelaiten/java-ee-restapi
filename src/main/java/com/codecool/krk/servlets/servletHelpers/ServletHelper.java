@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class ServletHelper {
 
-    public String parseRequest(HttpServletRequest request) throws IOException {
+    public String parseRequest(HttpServletRequest request) throws IOException{
         BufferedReader br = request.getReader();
         String formData = br.readLine();
         System.out.println(formData);

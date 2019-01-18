@@ -24,11 +24,17 @@ public class AllUsersServlet extends HttpServlet {
     private EntityManagerFactory emf = SingletonEntityManagerFactory.getInstance();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<User> allUsers = getUsers();
+        EntityManager em = emf.createEntityManager();
+        String hql = "FROM Users";
+        em.getTransaction().begin();
+        Query query = em.createQuery(hql, User.class);
+        List<User> allUsers = (List<User>) query.getResultList();
         Type usersType = new TypeToken<List<User>>(){}.getType();
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
         String json = gson.toJson(allUsers, usersType);
-        response.getWriter().write(json);
+        response.setHeader("Content-type", "application/json");
+        response.getWriter().print(json);
+        em.close();
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -51,11 +57,4 @@ public class AllUsersServlet extends HttpServlet {
         doPost(request, response);
     }
 
-    private List<User> getUsers() {
-        EntityManager em = emf.createEntityManager();
-        String hql = "FROM Users";
-        em.getTransaction().begin();
-        Query query = em.createQuery(hql, User.class);
-        return (List<User>) query.getResultList();
-    }
 }
