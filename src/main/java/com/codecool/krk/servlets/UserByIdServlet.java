@@ -54,11 +54,11 @@ public class UserByIdServlet extends HttpServlet {
         String url = request.getRequestURI();
         int userId = Integer.parseInt(url.replace("/user/", ""));
         User oldUser = entityManager.find(User.class, userId);
-        userFromRequest.setId(userId);
         if(oldUser == null) {
             System.out.println("BUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUULKAAAAAAAAAAAAAAAA");
             postUserWhenNull(response, entityManager, userFromRequest);
         }else {
+            userFromRequest.setId(userId);
             updateUser(response, entityManager, userFromRequest);
         }
 

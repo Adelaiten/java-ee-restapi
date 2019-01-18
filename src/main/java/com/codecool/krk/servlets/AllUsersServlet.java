@@ -4,9 +4,11 @@ import com.google.gson.reflect.TypeToken;
 import connections.SingletonEntityManagerFactory;
 import models.Comment;
 import models.User;
+import servletHelpers.ServletHelper;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -29,18 +31,31 @@ public class AllUsersServlet extends HttpServlet {
         response.getWriter().write(json);
     }
 
-    protected void doPost(HttpServletResponse response,  HttpServletRequest request) throws ServletException, IOException {
-        EntityManager entityManager = emf.createEntityManager();
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        EntityManager em = emf.createEntityManager();
+        ServletHelper servletHelper = new ServletHelper();
+        String requestJSON = servletHelper.parseRequest(request);
+        Gson gson = new Gson();
+        User user = gson.fromJson(requestJSON, User.class);
+        EntityTransaction transaction = em.getTransaction();
+        transaction.begin();
+        em.persist(user);
+        transaction.commit();
+        em.close();
+        response.setHeader("Content-type", "application/json");
+        response.getWriter().write("{persist successful}");
 
+    }
 
+    protected  void doPut(HttpServletRequest request,HttpServletResponse response) throws IOException, ServletException{
+        doPost(request, response);
     }
 
     private List<User> getUsers() {
         EntityManager em = emf.createEntityManager();
-        String hql = "FROM Comments";
+        String hql = "FROM Users";
         em.getTransaction().begin();
-        Query query = em.createQuery(hql, Comment.class);
-        em.close();
+        Query query = em.createQuery(hql, User.class);
         return (List<User>) query.getResultList();
     }
 }
