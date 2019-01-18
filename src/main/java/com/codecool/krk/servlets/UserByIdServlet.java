@@ -63,7 +63,7 @@ public class UserByIdServlet extends HttpServlet {
         try{
              json = servletHelper.parseRequest(request);
         }catch(IOException exc) {
-            System.out.println("Buffered reader exception!");
+            System.out.println("Buffered reader in servlet helper exception!");
             return;
         }
         User userFromRequest = getUserByJson(json);
@@ -114,7 +114,7 @@ public class UserByIdServlet extends HttpServlet {
         try{
             response.getWriter().print("{edit successful}");
         }catch(IOException ioexc) {
-            System.out.println("Printing json exception!");
+            System.out.println("Printing json to client exception!");
         }
 
     }

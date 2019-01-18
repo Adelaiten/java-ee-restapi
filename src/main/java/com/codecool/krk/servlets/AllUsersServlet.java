@@ -23,7 +23,7 @@ import java.util.List;
 public class AllUsersServlet extends HttpServlet {
     private EntityManagerFactory emf = SingletonEntityManagerFactory.getInstance();
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         EntityManager em = emf.createEntityManager();
         String hql = "FROM Users";
         em.getTransaction().begin();
@@ -33,14 +33,26 @@ public class AllUsersServlet extends HttpServlet {
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
         String json = gson.toJson(allUsers, usersType);
         response.setHeader("Content-type", "application/json");
-        response.getWriter().print(json);
+        try{
+            response.getWriter().print(json);
+        }catch(IOException ioexc) {
+            System.out.println("Printing json to client exception!");
+        }
+
         em.close();
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         EntityManager em = emf.createEntityManager();
         ServletHelper servletHelper = new ServletHelper();
-        String requestJSON = servletHelper.parseRequest(request);
+        String requestJSON;
+        try{
+            requestJSON= servletHelper.parseRequest(request);
+        }catch(IOException ioexc) {
+            System.out.println("Buffered reader in servlet Helper exception");
+            return;
+        }
+
         Gson gson = new Gson();
         User user = gson.fromJson(requestJSON, User.class);
         EntityTransaction transaction = em.getTransaction();
@@ -49,11 +61,16 @@ public class AllUsersServlet extends HttpServlet {
         transaction.commit();
         em.close();
         response.setHeader("Content-type", "application/json");
-        response.getWriter().write("{persist successful}");
+        try{
+            response.getWriter().write("{persist successful}");
+        }catch(IOException ioexc) {
+            System.out.println("Printing json to client exception");
+        }
+
 
     }
 
-    protected  void doPut(HttpServletRequest request,HttpServletResponse response) throws IOException, ServletException{
+    protected  void doPut(HttpServletRequest request,HttpServletResponse response) {
         doPost(request, response);
     }
 
