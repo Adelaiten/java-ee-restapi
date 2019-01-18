@@ -21,12 +21,16 @@ public class User {
 
     @Transient
     @Expose
+
     private List<Integer> notesIds;
 
     @OneToMany(cascade={CascadeType.ALL}, mappedBy = "user")
     @ElementCollection
     private List<Note> notes;
 
+    @OneToMany(cascade={CascadeType.ALL}, mappedBy = "user")
+    @ElementCollection
+    private List<Comment> comments;
 
     public User() {
 
@@ -47,11 +51,6 @@ public class User {
     public void setComments(List<Comment> comments) {
         this.comments = comments;
     }
-
-    @OneToMany(mappedBy = "user")
-
-    @ElementCollection
-    private List<Comment> comments;
 
     public List<Note> getNotes() {
         return notes;

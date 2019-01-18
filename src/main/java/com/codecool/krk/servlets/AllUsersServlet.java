@@ -55,7 +55,6 @@ public class AllUsersServlet extends HttpServlet {
         transaction.begin();
         em.persist(user);
         transaction.commit();
-        em.close();
         response.setHeader("Content-type", "application/json");
         try{
             response.getWriter().write("{persist successful}");
