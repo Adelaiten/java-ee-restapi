@@ -23,18 +23,22 @@ public class CommentsServlet extends HttpServlet {
     private EntityManagerFactory entityManagerFactory = SingletonEntityManagerFactory.getInstance();
     private ServletHelper servletHelper = new ServletHelper();
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            EntityManager em = entityManagerFactory.createEntityManager();
+            String hql = "FROM Comments";
+            em.getTransaction().begin();
+            Query query = em.createQuery(hql, Comment.class);
+            List<Comment> comments = (List<Comment>) query.getResultList();
+            Type commentsType = new TypeToken<List<Comment>>() {
+            }.getType();
+            Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+            String json = gson.toJson(comments, commentsType);
+            response.getWriter().write(json);
+            em.close();
+        } catch (IOException e){
 
-        EntityManager em = entityManagerFactory.createEntityManager();
-        String hql = "FROM Comments";
-        em.getTransaction().begin();
-        Query query = em.createQuery(hql, Comment.class);
-        List<Comment> comments = (List<Comment>) query.getResultList();
-        Type commentsType = new TypeToken<List<Comment>>(){}.getType();
-        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-        String json = gson.toJson(comments, commentsType);
-        response.getWriter().write(json);
-        em.close();
+        }
     }
 
     protected  void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException{
