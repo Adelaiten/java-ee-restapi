@@ -23,24 +23,20 @@ import java.util.List;
 public class AllUsersServlet extends HttpServlet {
     private EntityManagerFactory emf = SingletonEntityManagerFactory.getInstance();
 
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         EntityManager em = emf.createEntityManager();
-        String hql = "FROM Users";
-        em.getTransaction().begin();
-        Query query = em.createQuery(hql, User.class);
-        List<User> allUsers = (List<User>) query.getResultList();
-        Type usersType = new TypeToken<List<User>>(){}.getType();
-        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-        String json = gson.toJson(allUsers, usersType);
+        String json = getAllUsersJson(em);
         response.setHeader("Content-type", "application/json");
         try{
             response.getWriter().print(json);
         }catch(IOException ioexc) {
             System.out.println("Printing json to client exception!");
         }
-
         em.close();
     }
+
+
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         EntityManager em = emf.createEntityManager();
@@ -66,12 +62,24 @@ public class AllUsersServlet extends HttpServlet {
         }catch(IOException ioexc) {
             System.out.println("Printing json to client exception");
         }
-
-
+        em.close();
     }
+
 
     protected  void doPut(HttpServletRequest request,HttpServletResponse response) {
         doPost(request, response);
     }
 
+
+
+    private String getAllUsersJson(EntityManager em) {
+        String hql = "FROM Users";
+        em.getTransaction().begin();
+        Query query = em.createQuery(hql, User.class);
+        List<User> allUsers = (List<User>) query.getResultList();
+        Type usersType = new TypeToken<List<User>>(){}.getType();
+
+        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+        return gson.toJson(allUsers, usersType);
+    }
 }

@@ -51,9 +51,7 @@ public class UserByIdServlet extends HttpServlet {
         Gson gson = new Gson();
         User user = gson.fromJson(json, User.class);
         EntityTransaction transaction = entityManager.getTransaction();
-        transaction.begin();
-        entityManager.persist(user);
-        transaction.commit();
+        doTransaction(entityManager, user, transaction);
     }
 
     protected void doPut(HttpServletRequest request, HttpServletResponse response){
@@ -70,14 +68,13 @@ public class UserByIdServlet extends HttpServlet {
         String url = request.getRequestURI();
         int userId = Integer.parseInt(url.replace("/user/", ""));
         User oldUser = entityManager.find(User.class, userId);
+        
         if(oldUser == null) {
             postUserWhenNull(response, entityManager, userFromRequest);
         }else {
             userFromRequest.setId(userId);
             updateUser(response, entityManager, userFromRequest);
         }
-
-
 
     }
 
@@ -88,35 +85,27 @@ public class UserByIdServlet extends HttpServlet {
         int userId = Integer.parseInt(url.replace("/user/", ""));
         User user = entityManager.find(User.class, userId);
         EntityTransaction transaction = entityManager.getTransaction();
-        transaction.begin();
-        entityManager.remove(user);
-        transaction.commit();
+        doTransaction(entityManager, user, transaction);
     }
-
-
-    private String getUserJsonById(int id, HttpServletRequest request,  HttpServletResponse response)  {
-        EntityManager entityManager = emf.createEntityManager();
-        User user = entityManager.find(User.class, id);
-        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-        user.setNotesIds();
-        return gson.toJson(user);
-    }
-
 
 
 
     private void updateUser(HttpServletResponse response, EntityManager entityManager, User user)  {
         EntityTransaction transaction = entityManager.getTransaction();
-        transaction.begin();
-        entityManager.merge(user);
-        transaction.commit();
-        entityManager.close();
+        doTransaction(entityManager, user, transaction);
         try{
             response.getWriter().print("{edit successful}");
         }catch(IOException ioexc) {
             System.out.println("Printing json to client exception!");
         }
 
+    }
+
+    private void doTransaction(EntityManager entityManager, Object object, EntityTransaction transaction) {
+        transaction.begin();
+        entityManager.merge(object);
+        transaction.commit();
+        entityManager.close();
     }
 
 
@@ -140,4 +129,13 @@ public class UserByIdServlet extends HttpServlet {
         User user = gson.fromJson(requestJSON, User.class);
         return user;
     }
+
+    private String getUserJsonById(int id, HttpServletRequest request,  HttpServletResponse response)  {
+        EntityManager entityManager = emf.createEntityManager();
+        User user = entityManager.find(User.class, id);
+        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+        user.setNotesIds();
+        return gson.toJson(user);
+    }
+
 }
