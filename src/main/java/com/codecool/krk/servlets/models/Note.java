@@ -1,23 +1,39 @@
-package com.codecool.krk.models;
+package models;
 
+import com.google.gson.annotations.Expose;
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
-
-@Entity(name = "Notes")
+@Entity
+@Table(name = "Notes")
+@NamedNativeQuery(name="allNotesQuery", query="select * from notes", resultClass=Note.class)
 public class Note {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Expose
     private int noteId;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.ALL})
     private User user;
 
+    @Expose
     private String content;
+
+    @Expose
     private String title;
 
+    @Expose
     @Temporal(TemporalType.DATE)
     private Date date;
+
+    @Transient
+    @Expose
+    private int user_id;
+
+    @OneToMany(cascade={CascadeType.ALL}, mappedBy = "note")
+    @ElementCollection
+    private List<Comment> comments;
 
     public int getNoteId() {
         return noteId;
@@ -35,6 +51,11 @@ public class Note {
         this.user = user;
     }
 
+    public int getUserId() {return user_id;}
+
+    public void setUserId(int user_id) {
+        this.user_id = user_id;
+    }
 
     public String getContent() {
         return content;

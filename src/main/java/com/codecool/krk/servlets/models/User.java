@@ -1,22 +1,36 @@
-package com.codecool.krk.models;
+package models;
 
+import com.google.gson.annotations.Expose;
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
-
 @Entity(name = "Users")
 public class User {
     @Id
     @GeneratedValue
+    @Expose
     private int id;
+    @Expose
     private String nick;
+    @Expose
     private String name;
+    @Expose
     private String surname;
+    @Expose
     private String email;
 
+    @Transient
+    @Expose
+
+    private List<Integer> notesIds;
 
     @OneToMany(cascade={CascadeType.ALL}, mappedBy = "user")
     @ElementCollection
     private List<Note> notes;
+
+    @OneToMany(cascade={CascadeType.ALL}, mappedBy = "user")
+    @ElementCollection
+    private List<Comment> comments;
 
     public User() {
 
@@ -37,11 +51,6 @@ public class User {
     public void setComments(List<Comment> comments) {
         this.comments = comments;
     }
-
-    @OneToMany(mappedBy = "user")
-
-    @ElementCollection
-    private List<Comment> comments;
 
     public List<Note> getNotes() {
         return notes;
@@ -89,5 +98,16 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public List<Integer> getNotesIds() {
+        return notesIds;
+    }
+
+    public void setNotesIds() {
+        this.notesIds = new ArrayList<>();
+        for(Note note : this.notes) {
+            this.notesIds.add(note.getNoteId());
+        }
     }
 }

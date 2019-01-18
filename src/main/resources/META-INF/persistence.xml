@@ -22,8 +22,8 @@
 
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
             <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/szkolna_17"/>
-            <property name="javax.persistence.jdbc.user" value="karol"/>
-            <property name="javax.persistence.jdbc.password" value="4313284"/>
+            <property name="javax.persistence.jdbc.user" value="szkolna"/>
+            <property name="javax.persistence.jdbc.password" value="szkolna"/>
 
         </properties>
     </persistence-unit>
