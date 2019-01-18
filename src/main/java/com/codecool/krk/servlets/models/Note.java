@@ -3,6 +3,7 @@ package models;
 import com.google.gson.annotations.Expose;
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "Notes")
@@ -13,7 +14,7 @@ public class Note {
     @Expose
     private int noteId;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.ALL})
     private User user;
 
     @Expose
@@ -29,6 +30,10 @@ public class Note {
     @Transient
     @Expose
     private int user_id;
+
+    @OneToMany(cascade={CascadeType.ALL}, mappedBy = "note")
+    @ElementCollection
+    private List<Comment> comments;
 
     public int getNoteId() {
         return noteId;

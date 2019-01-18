@@ -63,9 +63,13 @@ public class NotesServlet extends HttpServlet {
 
         Note updatedNote = createNoteFromJSON(json);
 
+        String urlString = parseURL(request);
+        int noteNumber = Integer.parseInt(urlString);
+
+        updatedNote.setNoteId(noteNumber);
+
         updateNoteInTheDB(updatedNote);
 
-        response.setHeader("Content-type", "application/json");
         response.getWriter().write("{'updated':'successfully'}");
     }
 
@@ -74,10 +78,22 @@ public class NotesServlet extends HttpServlet {
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         EntityManager em = emf.createEntityManager();
 
-        int noteId = Integer.parseInt(request.getRequestURI());
+        int noteId = Integer.parseInt(parseURL(request));
 
         Note note = em.find(Note.class, noteId);
+
+        EntityTransaction transaction = em.getTransaction();
+
+        transaction.begin();
+
+//        Query deleteComments = em.createQuery("delete from models.Comment " +
+//                "where note_id ="+noteId);
+//        deleteComments.executeUpdate();
+
         em.remove(note);
+
+        transaction.commit();
+
         response.getWriter().write(String.format("{removed id=%d", noteId));
 
         em.close();
